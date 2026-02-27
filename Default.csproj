@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <Content Include="Default\wwwroot\css\site.css" />
+    <Content Include="Default\wwwroot\js\site.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Default\Controllers\" />
     <Folder Include="Models\" />
   </ItemGroup>
 
