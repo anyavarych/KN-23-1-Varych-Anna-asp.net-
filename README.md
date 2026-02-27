@@ -18,5 +18,6 @@
    Користувач може переглядати раніше згенеровані паролі, копіювати їх або видаляти.
 
 Схема БД:
-![image](https://github.com/user-attachments/assets/2a7fbb94-3918-4acb-9664-7901be32f63c)
+![photo_5262702648920577949_y](https://github.com/user-attachments/assets/d18f05e8-daaf-434b-befa-966d7437b9b2)
+
 
