@@ -1,0 +1,94 @@
+﻿@model List<PasswordGeneratorMvc.Models.PasswordEntry>
+
+@{
+    ViewData["Title"] = "Історія паролів";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Історія ваших паролів</h2>
+
+    <!-- Форма генерації з полями Назва і Логін -->
+    <form id="generateForm" class="mb-3 row g-2">
+        <div class="col-md-4">
+            <input type="text" id="title" class="form-control" placeholder="Назва пароля" required />
+        </div>
+        <div class="col-md-4">
+            <input type="text" id="login" class="form-control" placeholder="Логін" />
+        </div>
+        <div class="col-md-4 text-end">
+            <button type="submit" class="btn btn-primary">Згенерувати новий пароль</button>
+        </div>
+    </form>
+
+    <table class="table table-striped table-bordered table-hover" id="passwordTable">
+        <thead class="table-dark">
+            <tr>
+                <th>Назва</th>
+                <th>Логін</th>
+                <th>Пароль</th>
+                <th>Дія</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                    <tr data-id="@item.Id">
+                        <td>@item.Title</td>
+                        <td>@item.Login</td>
+                        <td>@item.EncryptedPassword</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-success" onclick="copyPassword('@item.EncryptedPassword')">Копіювати</button>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="deletePassword('@item.Id', this)">Видалити</button>
+                        </td>
+                    </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+function copyPassword(pass) {
+    navigator.clipboard.writeText(pass).then(() => {
+        alert("Пароль скопійовано!");
+    });
+}
+
+// Генерація нового пароля з полями Назва і Логін
+$('#generateForm').submit(function (e) {
+    e.preventDefault();
+
+    let title = $('#title').val();
+    let login = $('#login').val();
+
+    $.post('@Url.Action("Generate", "Password")', { title: title, login: login }, function (data) {
+        if (data.success) {
+            let row = `<tr data-id="${data.id}">
+                <td>${data.title}</td>
+                <td>${data.login}</td>
+                <td>${data.password}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-success" onclick="copyPassword('${data.password}')">Копіювати</button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="deletePassword('${data.id}', this)">Видалити</button>
+                </td>
+            </tr>`;
+            $('#passwordTable tbody').append(row);
+
+            $('#title').val('');
+            $('#login').val('');
+        }
+    });
+});
+
+// Видалення пароля
+function deletePassword(id, btn) {
+    $.post('@Url.Action("Delete", "Password")', { id: id }, function (data) {
+        if (data.success) {
+            $(btn).closest('tr').remove();
+        }
+    });
+}
+</script>
