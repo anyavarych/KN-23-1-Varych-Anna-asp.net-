@@ -1,41 +1,69 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using PasswordGeneratorMvc.Models;
+﻿using PasswordGeneratorMvc.Models;
 using PasswordGeneratorMvc.Data;
 
-namespace PasswordGeneratorMvc.Services;
-
-public class PasswordService
+namespace PasswordGeneratorMvc.Services
 {
-    public List<PasswordEntry> GetAll() => DatabaseSimulation.PasswordEntries;
-
-    public PasswordEntry GeneratePassword(string title, string login)
+    public class PasswordService
     {
-        var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-        var random = new Random();
-        var password = new string(Enumerable.Range(0, 16)
-            .Select(x => chars[random.Next(chars.Length)]).ToArray());
+        public List<PasswordEntry> GetAll()
+            => DatabaseSimulation.PasswordEntries;
 
-        var entry = new PasswordEntry
+        public PasswordEntry GeneratePassword(string title, string login)
         {
-            Id = Guid.NewGuid().ToString(),
-            UserId = "user-1",
-            Title = title,
-            Login = login,
-            EncryptedPassword = password,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+            var random = new Random();
 
-        DatabaseSimulation.PasswordEntries.Add(entry);
-        return entry;
-    }
+            var password = new string(Enumerable.Range(0, 16)
+                .Select(x => chars[random.Next(chars.Length)]).ToArray());
 
-    public void Delete(string id)
-    {
-        var item = DatabaseSimulation.PasswordEntries.FirstOrDefault(x => x.Id == id);
-        if (item != null)
-            DatabaseSimulation.PasswordEntries.Remove(item);
+            var entry = new PasswordEntry
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserId = "user-1",
+                Title = title,
+                Login = login,
+                EncryptedPassword = password,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            DatabaseSimulation.PasswordEntries.Add(entry);
+
+            return entry;
+        }
+
+        public PasswordEntry GetById(string id)
+        {
+            return DatabaseSimulation.PasswordEntries.First(x => x.Id == id);
+        }
+
+        public void Create(PasswordEntry entry)
+        {
+            entry.Id = Guid.NewGuid().ToString();
+            entry.CreatedAt = DateTime.UtcNow;
+            entry.UpdatedAt = DateTime.UtcNow;
+
+            DatabaseSimulation.PasswordEntries.Add(entry);
+        }
+
+        public void Update(PasswordEntry entry)
+        {
+            var existing = GetById(entry.Id);
+
+            existing.Title = entry.Title;
+            existing.Login = entry.Login;
+            existing.WebsiteUrl = entry.WebsiteUrl;
+            existing.EncryptedPassword = entry.EncryptedPassword;
+            existing.Notes = entry.Notes;
+            existing.UpdatedAt = DateTime.UtcNow;
+        }
+
+        public void Delete(string id)
+        {
+            var item = DatabaseSimulation.PasswordEntries.FirstOrDefault(x => x.Id == id);
+
+            if (item != null)
+                DatabaseSimulation.PasswordEntries.Remove(item);
+        }
     }
 }

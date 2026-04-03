@@ -1,4 +1,6 @@
-﻿namespace PasswordGeneratorMvc.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PasswordGeneratorMvc.Models
 {
     public class PasswordEntry
     {

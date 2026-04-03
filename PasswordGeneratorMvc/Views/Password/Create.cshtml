@@ -1,0 +1,26 @@
+﻿@model PasswordGeneratorMvc.ViewModels.PasswordEntryViewModel
+
+<h2>Створити</h2>
+
+<form asp-action="Create">
+    <div asp-validation-summary="All"></div>
+
+    <input asp-for="Title" placeholder="Назва" />
+    <span asp-validation-for="Title"></span>
+
+    <input asp-for="Login" placeholder="Логін" />
+
+    <input asp-for="WebsiteUrl" placeholder="URL" />
+    <span asp-validation-for="WebsiteUrl"></span>
+
+    <input asp-for="Password" placeholder="Пароль" />
+    <span asp-validation-for="Password"></span>
+
+    <textarea asp-for="Notes"></textarea>
+
+    <button type="submit">Зберегти</button>
+</form>
+
+@section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+}
