@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PasswordGeneratorMvc.Services;
 using PasswordGeneratorMvc.Models;
+using PasswordGeneratorMvc.Services;
 using PasswordGeneratorMvc.ViewModels;
 
 namespace PasswordGeneratorMvc.Controllers
@@ -14,38 +14,12 @@ namespace PasswordGeneratorMvc.Controllers
             _service = service;
         }
 
-        // ===== INDEX =====
         public IActionResult Index()
         {
-            var passwords = _service.GetAll();
-            return View(passwords);
+            return View(_service.GetAll());
         }
 
-        // ===== GENERATE =====
-        [HttpPost]
-        public IActionResult Generate(string title, string login)
-        {
-            var newPassword = _service.GeneratePassword(title, login);
-
-            return Json(new
-            {
-                success = true,
-                id = newPassword.Id,
-                title = newPassword.Title,
-                login = newPassword.Login,
-                password = newPassword.EncryptedPassword
-            });
-        }
-
-        // ===== DELETE =====
-        [HttpPost]
-        public IActionResult Delete(string id)
-        {
-            _service.Delete(id);
-            return Json(new { success = true });
-        }
-
-        // ===== CREATE =====
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -55,60 +29,66 @@ namespace PasswordGeneratorMvc.Controllers
         public IActionResult Create(PasswordEntryViewModel model)
         {
             if (!ModelState.IsValid)
+            {
                 return View(model);
+            }
 
-            var entry = new PasswordEntry
+            _service.Create(new PasswordEntry
             {
                 Title = model.Title,
                 Login = model.Login,
                 WebsiteUrl = model.WebsiteUrl,
                 EncryptedPassword = model.Password,
-                Notes = model.Notes,
                 UserId = "user-1"
-            };
+            });
 
-            _service.Create(entry);
-
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
 
-        // ===== EDIT =====
+        [HttpGet]
         public IActionResult Edit(string id)
         {
             var item = _service.GetById(id);
 
-            var vm = new PasswordEntryViewModel
+            if (item == null)
+                return RedirectToAction(nameof(Index));
+
+            return View(new PasswordEntryViewModel
             {
                 Id = item.Id,
                 Title = item.Title,
                 Login = item.Login,
                 WebsiteUrl = item.WebsiteUrl,
-                Password = item.EncryptedPassword,
-                Notes = item.Notes
-            };
-
-            return View(vm);
+                Password = item.EncryptedPassword
+            });
         }
 
         [HttpPost]
         public IActionResult Edit(PasswordEntryViewModel model)
         {
             if (!ModelState.IsValid)
+            {
                 return View(model);
+            }
 
-            var entry = new PasswordEntry
+            _service.Update(new PasswordEntry
             {
                 Id = model.Id!,
                 Title = model.Title,
                 Login = model.Login,
                 WebsiteUrl = model.WebsiteUrl,
                 EncryptedPassword = model.Password,
-                Notes = model.Notes
-            };
+                UserId = "user-1"
+            });
 
-            _service.Update(entry);
+            return RedirectToAction(nameof(Index));
+        }
 
-            return RedirectToAction("Index");
+        [HttpPost]
+        public IActionResult Delete(string id)
+        {
+            _service.Delete(id);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

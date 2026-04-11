@@ -8,7 +8,6 @@ namespace PasswordGeneratorMvc.ViewModels
         public string? Id { get; set; }
 
         [Required(ErrorMessage = "Введіть назву")]
-        [StringLength(100)]
         public string Title { get; set; } = "";
 
         public string? Login { get; set; }
@@ -16,8 +15,8 @@ namespace PasswordGeneratorMvc.ViewModels
         [Url(ErrorMessage = "Невірний URL")]
         public string? WebsiteUrl { get; set; }
 
-        [Required]
-        [MinLength(6)]
+        [Required(ErrorMessage = "Пароль обов'язковий")]
+        [MinLength(6, ErrorMessage = "Мінімум 6 символів")]
         [CustomPassword]
         public string Password { get; set; } = "";
 
