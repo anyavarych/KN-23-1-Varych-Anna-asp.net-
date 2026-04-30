@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PasswordGeneratorMvc.Filters;
 using PasswordGeneratorMvc.Models;
 using PasswordGeneratorMvc.Services;
 using PasswordGeneratorMvc.ViewModels;
 
 namespace PasswordGeneratorMvc.Controllers
 {
+    [ServiceFilter(typeof(ControllerLoggingFilter))]
     public class PasswordController : Controller
     {
         private readonly PasswordService _service;
@@ -20,18 +22,18 @@ namespace PasswordGeneratorMvc.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(ActionLoggingFilter), Arguments = new object[] { "CreateGET" })]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [TypeFilter(typeof(ActionLoggingFilter), Arguments = new object[] { "CreatePOST" })]
         public IActionResult Create(PasswordEntryViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             _service.Create(new PasswordEntry
             {
@@ -41,7 +43,6 @@ namespace PasswordGeneratorMvc.Controllers
                 EncryptedPassword = model.Password,
                 UserId = "user-1"
             });
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -49,7 +50,6 @@ namespace PasswordGeneratorMvc.Controllers
         public IActionResult Edit(string id)
         {
             var item = _service.GetById(id);
-
             if (item == null)
                 return RedirectToAction(nameof(Index));
 
@@ -67,9 +67,7 @@ namespace PasswordGeneratorMvc.Controllers
         public IActionResult Edit(PasswordEntryViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             _service.Update(new PasswordEntry
             {
@@ -80,7 +78,6 @@ namespace PasswordGeneratorMvc.Controllers
                 EncryptedPassword = model.Password,
                 UserId = "user-1"
             });
-
             return RedirectToAction(nameof(Index));
         }
 
