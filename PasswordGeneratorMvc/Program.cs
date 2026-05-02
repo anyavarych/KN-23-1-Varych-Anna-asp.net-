@@ -42,9 +42,9 @@ app.Map("/info", infoApp =>
     {
         var logger = context.RequestServices
             .GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("[app.Map /info] Окремий підпайплайн");
+        logger.LogInformation("[app.Map /info] Separate sub-pipeline");
         await context.Response.WriteAsync(
-            "INFO: це окремий підпайплайн (app.Map + app.Run)");
+            "INFO: this is a separate sub-pipeline (app.Map + app.Run)");
     });
 });
 
@@ -55,9 +55,9 @@ app.Map("/terminal", terminalApp =>
     {
         var logger = context.RequestServices
             .GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("[app.Run /terminal] Термінальний обробник");
+        logger.LogInformation("[app.Run /terminal] Terminal handler");
         await context.Response.WriteAsync(
-            "TERMINAL: app.Run — термінальний обробник, далі нічого не виконується");
+            "TERMINAL: app.Run - terminal handler, nothing executes after this");
     });
 });
 
