@@ -1,0 +1,36 @@
+﻿using PasswordGeneratorApi.Models;
+namespace PasswordGeneratorApi.Data
+{
+    public static class DatabaseSimulation
+    {
+        public static List<User> Users { get; } = new()
+    {
+        new User
+        {
+            Id = "user-1",
+            Email = "demo@test.com",
+            UserName = "demo"
+        }
+    };
+        public static List<PasswordEntry> PasswordEntries { get; } = new()
+    {
+        new PasswordEntry
+        {
+            Id = Guid.NewGuid().ToString(),
+            UserId = "user-1",
+            Title = "Gmail",
+            Login = "demo@gmail.com",
+            WebsiteUrl = "https://gmail.com/",
+            EncryptedPassword = "encrypted_password_example",
+            Notes = "Personal mail"
+        }
+    };
+        public static List<PasswordGeneratorSettings> GeneratorSettings { get; } = new()
+    {
+        new PasswordGeneratorSettings
+        {
+            UserId = "user-1"
+        }
+    };
+    }
+}
