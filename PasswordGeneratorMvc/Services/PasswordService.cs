@@ -38,5 +38,6 @@ namespace PasswordGeneratorMvc.Services
             if (item != null)
                 DatabaseSimulation.PasswordEntries.Remove(item);
         }
+
     }
 }

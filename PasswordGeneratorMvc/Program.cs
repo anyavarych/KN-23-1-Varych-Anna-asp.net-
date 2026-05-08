@@ -1,70 +1,65 @@
+п»їusing Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using PasswordGeneratorMvc.Data;
 using PasswordGeneratorMvc.Filters;
 using PasswordGeneratorMvc.Middleware;
+using PasswordGeneratorMvc.Models;
 using PasswordGeneratorMvc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<PasswordService>();
+// DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration
+        .GetConnectionString("DefaultConnection")));
 
-// Реєстрація фільтрів у DI — потрібна для ServiceFilter
+// Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedEmail = false;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// Cookie РЅР°Р»Р°С€С‚СѓРІР°РЅРЅСЏ
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+
+// РЎРµСЂРІС–СЃРё
+builder.Services.AddSingleton<PasswordService>();
 builder.Services.AddScoped<GlobalLoggingFilter>();
 builder.Services.AddScoped<ControllerLoggingFilter>();
 
 builder.Services.AddControllersWithViews(options =>
 {
-    // Глобальний фільтр через ServiceFilter
     options.Filters.AddService<GlobalLoggingFilter>();
 });
 
+builder.Services.AddRazorPages();
+
 var app = builder.Build();
 
-//  1. app.Use проміжний компонент (не термінальний) 
-app.Use(async (context, next) =>
-{
-    var logger = context.RequestServices
-        .GetRequiredService<ILogger<Program>>();
-    logger.LogInformation(
-        "[app.Use] ? Before next ? {Path}", context.Request.Path);
-    await next();
-    logger.LogInformation(
-        "[app.Use] ? After next ? {Path}", context.Request.Path);
-});
-
-//  2. Кастомний middleware 
-app.UseRequestLogging();
-
+app.UseRequestLogging(); // middleware
 app.UseStaticFiles();
-
-//  3. app.Map  розгалуження на окремий підпайплайн 
-app.Map("/info", infoApp =>
-{
-    infoApp.Run(async context =>
-    {
-        var logger = context.RequestServices
-            .GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("[app.Map /info] Separate sub-pipeline");
-        await context.Response.WriteAsync(
-            "INFO: this is a separate sub-pipeline (app.Map + app.Run)");
-    });
-});
-
-//  4. app.Map + app.Run  термінальний обробник 
-app.Map("/terminal", terminalApp =>
-{
-    terminalApp.Run(async context =>
-    {
-        var logger = context.RequestServices
-            .GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("[app.Run /terminal] Terminal handler");
-        await context.Response.WriteAsync(
-            "TERMINAL: app.Run - terminal handler, nothing executes after this");
-    });
-});
-
 app.UseRouting();
+app.UseAuthentication(); 
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Password}/{action=Index}/{id?}");
+    pattern: "{controller=Password}/{action=Register}/{id?}");
+app.MapRazorPages();
+
+// Seed Admin
+await SeedData.InitializeAsync(app.Services);
 
 app.Run();
