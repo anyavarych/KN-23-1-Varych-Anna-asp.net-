@@ -1,0 +1,92 @@
+﻿@model List<PasswordGeneratorMvc.ViewModels.UserListItemViewModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-4">
+    <h2>⚙️ Панель адміністратора</h2>
+    <p class="text-muted">Управління користувачами системи</p>
+
+    @if (TempData["Error"] != null)
+    {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <table class="table table-hover table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ПІБ</th>
+                <th>Email</th>
+                <th>Ролі</th>
+                <th>Статус</th>
+                <th style="width:280px;">Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                    <tr class="@(user.IsLockedOut ? "table-danger" : "")">
+                        <td>@user.FullName</td>
+                        <td>@user.Email</td>
+                        <td>
+                        @foreach (var role in user.Roles)
+                        {
+                                    <span class="badge bg-@(role == "Admin" ? "danger" : "primary")">
+                                @role
+                                    </span>
+                        }
+                        </td>
+                        <td>
+                        @if (user.IsLockedOut)
+                        {
+                                    <span class="badge bg-danger">Заблоковано</span>
+                        }
+                        else
+                        {
+                                    <span class="badge bg-success">Активний</span>
+                        }
+                        </td>
+                        <td>
+                            <a asp-action="EditRoles" asp-route-id="@user.Id"
+                               class="btn btn-sm btn-outline-primary">
+                                Ролі
+                            </a>
+
+                        @if (user.IsLockedOut)
+                        {
+                                    <form asp-action="UnlockUser" method="post"
+                                          style="display:inline;">
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-success">
+                                            Розблокувати
+                                        </button>
+                                    </form>
+                        }
+                        else
+                        {
+                                    <form asp-action="LockUser" method="post"
+                                          style="display:inline;">
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-warning">
+                                            Заблокувати
+                                        </button>
+                                    </form>
+                        }
+
+                            <form asp-action="DeleteUser" method="post"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Видалити користувача?')">
+                                <input type="hidden" name="id" value="@user.Id" />
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger">
+                                    Видалити
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+            }
+        </tbody>
+    </table>
+</div>

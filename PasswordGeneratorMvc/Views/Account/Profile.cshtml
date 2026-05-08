@@ -1,0 +1,46 @@
+﻿@model PasswordGeneratorMvc.ViewModels.EditProfileViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">👤 Мій профіль</h4>
+        </div>
+        <div class="card-body p-4">
+
+            @if (ViewBag.Success != null)
+            {
+                    <div class="alert alert-success">@ViewBag.Success</div>
+            }
+
+            <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+            <form asp-action="Profile" method="post">
+                <div class="mb-3">
+                    <label asp-for="FullName" class="form-label"></label>
+                    <input asp-for="FullName" class="form-control" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" readonly />
+                    <small class="text-muted">Email змінити не можна</small>
+                </div>
+
+                <button type="submit" class="btn btn-info text-white w-100">
+                    Зберегти зміни
+                </button>
+            </form>
+
+            <hr />
+            <div class="text-center">
+                <a asp-action="ChangePassword" class="btn btn-outline-warning">
+                    🔑 Змінити пароль
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
